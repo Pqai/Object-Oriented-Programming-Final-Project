@@ -140,9 +140,9 @@ namespace GameProgram {
 
                     for (int i = 0; i< 4; i++)
                     {
-                        cards.Add(new Skip());
+                        cards.Add(new Skip(color));
                         cards.Add(new ChangeColour());
-                        cards.Add(new PlusTwo());
+                        cards.Add(new PlusTwo(color));
                     }
                 }
             }

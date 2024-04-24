@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Drawing;
+using System.ComponentModel.Design;
 
 //CARD GAME IDEAS
 //uno
@@ -37,11 +38,6 @@ namespace GameProgram {
         {
             return 0;
         }
-    }
-
-    public virtual void Reset()
-    {
-
     }
 
     public abstract class CardsBase
@@ -181,7 +177,8 @@ namespace GameProgram {
     public class Player
     {
 
-        private List<CardsBase> hand;
+        public string Name { get; }
+        public List<CardsBase> hand;
 
         public Player()
         {
@@ -250,12 +247,22 @@ namespace GameProgram {
             }
         return false;
         }
+
+        public CardsBase GetTopCard()
+        {
+            if (cardsOnPile.Count > 0)
+            {
+                return cardsOnPile.Last();
+            }
+            return null;
+        }
     }
 
     public class Game
     {
         private List<Player> players;
         private Deck deck;
+        private Pile pile;
 
         public Game(int numPlayers, bool[] isHuman)
         {
@@ -285,6 +292,60 @@ namespace GameProgram {
                     players.Add(new ComputerPlayer($"Computer {i + 1}"));
                 }
             }
+        }
+
+        public void PlayNextTurn()
+        {
+            int currentPlayerIndex = 0;
+            Player currentPlayer = players[currentPlayerIndex];
+
+            Console.WriteLine($"It's {currentPlayer.Name}'s turn");
+            currentPlayer.PrintHand();
+            bool validMove = false;
+            while (!validMove)
+            {
+                Console.WriteLine("Choose a card to play either (enter card number or type draw)");
+                string input = Console.ReadLine();
+                if (input.ToLower() == "draw")
+                {
+                    CardsBase drawnCard = deck.Draw();
+                    currentPlayer.AddToHand(drawnCard);
+                    Console.WriteLine($"You Drew: {drawnCard}");
+                    validMove = true;
+
+                }
+                else
+                {
+                    if (int.TryParse(input, out int cardIndex) && cardIndex >= 1 && cardIndex <= currentPlayer.hand.Count)
+                    {
+                        CardsBase selectedCard = currentPlayer.hand[cardIndex - 1];
+                        if (pile.CanPlayCard(selectedCard))
+                        {
+                            pile.AddToPile(selectedCard);
+                            currentPlayer.hand.RemoveAt(cardIndex - 1);
+                            Console.WriteLine($"You played: {selectedCard}");
+                            validMove = true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("You cannot play that card. Choose another or draw");
+
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input. Try again");
+                    }
+                }
+            }
+
+            if (currentPlayer.hand.Count == 0)
+            {
+                Console.WriteLine($"{currentPlayer.Name} wins!");
+                return;
+            }
+
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.Count;
         }
 
         private void DealInitialCards(Player player)

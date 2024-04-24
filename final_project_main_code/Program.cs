@@ -26,20 +26,6 @@ namespace GameProgram {
         PlusTwo
     }
 
-    public int CheckUno(List<CardsBase> hand)//checking if you have 1 card left
-    {
-
-        if (hand.Count == 1) 
-        { 
-        Console.WriteLine("UNO!!!");
-        return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
     public abstract class CardsBase
     {
 
@@ -291,6 +277,20 @@ namespace GameProgram {
                 {
                     players.Add(new ComputerPlayer($"Computer {i + 1}"));
                 }
+            }
+        }
+
+        public int CheckUno(List<CardsBase> hand)//checking if you have 1 card left
+        {
+
+            if (hand.Count == 1)
+            {
+                Console.WriteLine("UNO!!!");
+                return 1;
+            }
+            else
+            {
+                return 0;
             }
         }
 
